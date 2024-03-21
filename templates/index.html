@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciador Financeiro Pessoal</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+
+<body>
+  <header class="cabecalho">
+    <h1>CONTROLE FINANCEIRO</h1>
+    <!-- <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo"> -->
+  </header>
+  <main class="conteudo">
+    <section class="adicionar-conta">
+      <h2>Adicionar Nova Conta</h2>
+      <form action="/add_conta" method="post">
+          <div class="tipo-conta">
+              <!-- <label for="tipo">Tipo de Conta:</label> -->
+              <div class="tipo-conta-buttons">
+                  <input type="radio" id="conta_pagar" name="tipo" value="pagar" required>
+                  <label for="conta_pagar">Conta a Pagar</label>
+                  
+                  <input type="radio" id="conta_receber" name="tipo" value="receber" required>
+                  <label for="conta_receber">Conta a Receber</label>
+              </div>
+          </div>
+          <label for="valor">Valor:</label>
+          <input type="number" name="valor" id="valor" required>
+          <label for="data_vencimento">Data de Vencimento:</label>
+          <input type="date" name="data_vencimento" id="data_vencimento" required>
+          <label for="descricao">Descrição:</label>
+          <input type="text" name="descricao" id="descricao" required>
+          <button type="submit">Adicionar Conta</button>
+      </form>
+  </section>
+
+    <section class="contas">
+        <section class="contas-pagar">
+            <h2>Contas a Pagar</h2>
+            <ul>
+                {% for conta in contas_pagar %}
+                <li class="conta pagar">
+                  <div class="info">
+                    <p><strong>Valor: R$</strong> {{ conta.valor }}</p>
+                    <p><strong>Data de Vencimento:</strong> {{ conta.data_vencimento }}</p>
+                    <p><strong>Descrição:</strong> {{ conta.descricao }}</p>
+                  </div>
+                  <div class="acoes">
+                    {% if not conta.paga %}
+                    <a href="{{ url_for('pagar_conta', id=conta.id) }}">Pagar</a>
+                    {% else %}
+                    <span class="paga">Paga</span>
+                    {% endif %}
+                    <a href="{{ url_for('editar_conta', id=conta.id) }}">Editar</a>
+                    <a href="{{ url_for('excluir_conta', id=conta.id) }}">Excluir</a>
+                  </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="contas-receber">
+            <h2>Contas a Receber</h2>
+            <ul>
+                {% for conta in contas_receber %}
+                <li class="conta receber">
+                  <div class="info">
+                    <p><strong>Valor: R$</strong> {{ conta.valor }}</p>
+                    <p><strong>Data de Vencimento:</strong> {{ conta.data_vencimento }}</p>
+                    <p><strong>Descrição:</strong> {{ conta.descricao }}</p>
+                  </div>
+                  <div class="acoes">
+                    {% if not conta.paga %}
+                    <a href="{{ url_for('pagar_conta', id=conta.id) }}">Pagar</a>
+                    {% else %}
+                    <span class="paga">Paga</span>
+                    {% endif %}
+                    <a href="{{ url_for('editar_conta', id=conta.id) }}">Editar</a>
+                    <a href="{{ url_for('excluir_conta', id=conta.id) }}">Excluir</a>
+                  </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </section>
+
+    <section class="graficos">
+      <h2>Gráficos</h2>
+      <canvas id="graficoContas"></canvas>
+  </section>
+  <script>
+    // Receber os totais de contas a pagar e receber do Flask
+    var totalPagar = {{ total_pagar }};
+    var totalReceber = {{ total_receber }};
+
+    // Renderizar o gráfico
+    var ctx = document.getElementById('graficoContas').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Contas a Pagar', 'Contas a Receber'],
+            datasets: [{
+                label: 'Valor das Contas',
+                data: [totalPagar, totalReceber],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+</script>
+</main>
+  <footer class="rodape">
+    <p>&copy; 2024 Gerenciador Financeiro Pessoal</p>
+  </footer>
+</body>
+</html>
