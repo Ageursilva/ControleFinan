@@ -7,7 +7,7 @@ db = SQLAlchemy()
 
 Base = declarative_base()
 
-engine = create_engine('sqlite:///C:/Users/Ageu4/Área de Trabalho/projeto/database.db')
+engine = create_engine('sqlite:///C:/Users/Ageu4/Área de Trabalho/FinControl/database.db')
 
 
 Session = sessionmaker(bind=engine)
